@@ -1,5 +1,19 @@
 
 \begin{abstract}
-     Go through the most important hardware updates in Pascal in comparison to the Kepler and Maxwell architectures.
-     Expose algorithmic limitations (focusing on deep learning) of the previous architectures and where improvements can be expected in the newer platform.
+\textbf{TODO: This needs some work. \\}
+The Heterogeneous Computing model has different processors for throughput-intensive and latency-sensitive tasks.
+Latency-optimized CPUs use complex branch prediction, speculative execution, register remaining, etc.
+This requires a lot of silicon surface and thus a lot of energy.
+Throughput-intensive systems reduce these complexities and work at minimal energy per bit.
+CPU-systems cannot go faster anymore.
+There are many ideas for configuring systems that work more efficiently under heterogeneous workloads.
+In debate are the CPU and accelerator architecture, the types of inter-/intra-node interconnects, and the heterogeneous vs self-hosted model.
+One of the aproaches is using an heterogeneous system formed by a combination of CPUs and GPUs.
+Nvidia is betting strongly on these systems, building their GPUs not only for graphics but for High Performance Computing.
+The advantage of GPUs for computation is achieved by dedicating more transistors to arithmetic logics and less to control.
+In this document I go through the most important hardware updates in Pascal emphasizing NVLink.
+NVLink is important because it breaks some of the bottlenecks appearing at GPU-to-GPU communication.
+Also a comparison of Pascal to previous architectures is presented.
+At the end there is a description of an attempt to create a general hardware model for GPGPU.
+ % Expose algorithmic limitations (focusing on deep learning) of the previous architectures and where improvements can be expected in the newer platform.
 \end{abstract}
