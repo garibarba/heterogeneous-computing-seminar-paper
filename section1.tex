@@ -21,8 +21,8 @@ Thus the description has to be based on official patents and research papers.
 
 \subsubsection{CUDA under the descriptive model}
 The GPU is the atomic element forming the second level of the hierarchy.
-The first level is composed of the GigaThread Engine, CUDA Work Distributor, Data Transfer Engine, Streaming Multiprocessor array, and local/global memory.
-Each Streaming Multiprocessor is broken into components of the 0th level.
+The first level is composed by the GigaThread Engine, CUDA Work Distributor, Data Transfer Engine, Streaming Multiprocessor array, and local/global memory.
+Each Streaming Multiprocessor is broken into analogous components of the 0th level.
 These are the Thread controller, Warp scheduler, Load/Store Units, local/shared registers and ALU arrays.
 
 Analogous components of different levels have different behaviours.
@@ -33,16 +33,11 @@ task Buffers (program/block counters vs reference counter), Warp scheduler vs CU
 The GigaThread work scheduler balances work among Streaming Multiprocessors.
 The Streaming Multiprocessors scheduler executes concurrent threads to help reduce the effect of long latency loads from DRAM memory.
 
-All kernel input and output memory resides on DRAM.
-ALUs work on local/shared registers.
-Load/Store Units array operations moving data in and out of these 2 memories are sped up through L2/L1 cache.
-L2 cache is already on chip but outside the Streaming Multiprocessors, where L1 cache resides.
-
 \subsubsection{Future Trends proposed in \cite{Hu:2016:CLG:2891449.2873053}}
 
 The current hierarchy consists of 2 levels, but this is not intrinsic to the model.
 We could expect to see hierarchies with more levels or tasks of different levels being launched on the same hardware level.
-Recursive kernel invocation and maybe the DGX-1 --- with faster GPU-to-GPU interconnections --- point in this direction.
+Recursive kernel invocation and maybe the DGX-1 --- with several GPUs forming a higher level --- point in this direction.
 
 The hierarchical cache system reflects the convergence trend between CPU and GPU.
 GPGPU is fundamentally a hierarchical system of moving data to computing.

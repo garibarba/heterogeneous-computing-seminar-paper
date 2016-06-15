@@ -16,7 +16,7 @@ The biggest changes were introduced in the Fermi microarchitecture.
 % The main source of information comes from the Whitepaper for the GP100 GPU, presenting the Pascal microarchitecture.
 
 \subsection{Historical progress}
-In 2010, Nvidia presented the Fermi microarchitecture, bridging many of the gaps needed for intensive use of GPUs in HPC.
+In 2010, Nvidia presented the Fermi microarchitecture, easing intensive use of GPUs in HPC.
 Fermi introduced 40-bit memory addressing, and ISA support for up to 64-bit addressing \cite{nickolls2010gpu}.
 It adopted the IEE 754-2008 floating point standard and enabled 64-bit floating point operations at only half of the throughput of FP32.
 Fermi also introduced the current hierarchical cache with L1 cache connected to L2 cache and L2 to DRAM, with unified access to the three levels.
@@ -26,7 +26,7 @@ The amount of L1 and L2 were configurable for the programmer, allowing a variabl
 The next generation, Kepler, was introduced in 2012 and introduced Dynamic Parallelism.
 Dynamic Parallelism refers to enabling GPU threads to launch other threads (kernels launching kenerls).
 This provides the programming model with more flexibility.
-This architecture is the one currently in use for GPGPU HPC tasks requiring 64-bit floating point precission.
+This architecture is the one currently in use for GPGPU HPC tasks requiring 64-bit floating point precision.
 
 The Maxwell microarchitecture, presented in 2014 introduced Unified Virtual Memory.
 This was an important step in simplifying the programming model.
@@ -44,7 +44,7 @@ All this comes with a reduction of the transistor size by using a 16nm FinFET te
 
 The Volta microarchitecture was suposed to follow Maxwell.
 However, lack of maturity of Hybrid Memory Cube versus High Bandwidth Memory, forced Nvidia to switch to the Pascal microarchitecture \cite{wccftech:volta}.
-It will be installed in supercomputers in 2017, coming to the market in 2018.
+Volta systems will be installed in supercomputers in 2017, coming to the market in 2018.
 
 \subsection{Recent evolution --- Pascal vs Kepler and Maxwell}
 The intent of this section is to try to make the recent architecture changes clear.
@@ -58,22 +58,21 @@ Note that the letter preceding the chip model number, stands for the first lette
 
 In the more recent architectures a clearer hierarchical organization can be seen.
 This is related to the GPGPU model presented in Section \ref{sec:gpgpu}.
-GM200 and GP100 have both 6 Graphics Processing Clusters, formed by Texture Processing Clusters, formed by Streaming Multiprocessors.
+GM200 and GP100 have both 6 Graphics Processing Clusters, formed by Texture Processing Clusters, formed by smaller Streaming Multiprocessors.
 In contrast, the Kepler chips are structured as an array of 15 Streaming Multiprocessors with lots of processing cores each.
-Each Texture Processing Cluster in Pascal contains 2 Streaming Multiprocessor, in contrast to each Texture Processing Cluster corresponding to a single Streaming Multiprocessor in the Kepler and Maxwell architectures
 The number of CUDA Cores per Streaming Multiprocessor keeps decreasing.
-The GK110, GM200, and GP100 have respectively 192, 128 and 64 FP32 CUDA Cores/Streaming Multiprocessor.
+The GK110, GM200, and GP100 have respectively 192, 128 and 64 FP32 CUDA Cores per Streaming Multiprocessor.
 Kepler has a ratio of 1:3 FP64 to FP32 CUDA Cores, which was decreased to 1:32 in Maxwell.
 Pascal has increased this ratio to 1:2 by having FP16 as part of the FP32 ALUs.
 The number of Streaming Multiprocessors per GPU increases continously, giving an increasing number of CUDA Cores per GPU.
 
 The scheduler data path in Pascal is changed with respect to Kepler and Maxwell.
 A big improvement in the scheduler in comparison to Maxwell is that each warp scheduler can dispatch two warp instructions per clock.
-This allows for launching simultaneously two independent instrunctions (e.g. to ALU and Load/Store Unit).
+This allows for launching simultaneously two independent instructions (e.g. to ALU and Load/Store Unit).
 
 Instruction-level preemption is a very relevant Pascal feature vs block-level preemption on the Maxwell and Kepler architectures.
 
-Maxwell improved on the 64KB configurable shared memory/L1 cache of Kepler by increasing the available memory and creating separate spaces for shared memory and L1 cahce.
+Maxwell improved on the 64KB configurable shared memory/L1 cache of Kepler by increasing the available memory and creating separate spaces for shared memory and L1 cache.
 The L2 cache in Pascal is not much larger with 4096KB, but the total L1 cache available per CUDA Core gets doubled.
 The Register File Size per Streaming Multiprocessor has also been kept constant while decreasing the number of cores.
 All this effectively increases the amount of fast cache and registers available per core, improving execution speed and concurrency.
@@ -88,4 +87,4 @@ Kepler implemented atomic memory operations in software just like Fermi in a loc
 Maxwell enabled native hardware support for atomic operations with 32-bit integers and 32-bit and 64-bit compare-and-swap operations.
 Pascal allows atomics in Unified Memory, including 32 and 64-bit support for both integers and floats.
 
-A constant in all this evolution is the TFLOPS/W improvement, effectively following the path of Moore's law.
+A constant in all this evolution is the TFLOPS/W improvement, effectively serving as a modification of Moore's law.

@@ -1,11 +1,12 @@
 
 \begin{abstract}
-Single-CPU-systems cannot achieve speed-ups by themselves anymore.
-There is not much that can be done for making sequential algorithms faster.
+Single-CPU-systems cannot achieve significant speed-ups by increasing clock speeds anymore.
+There is not much that can be done in that way for making sequential algorithms orders of magnitude faster.
 However many algorithms have at least some parallelizable sections.
 There are many diferent ideas for configuring systems that work more efficiently under heterogeneous workloads.
 In debate are the heterogeneous and self-hosted models, CPU and accelerator architecture, and the types of inter-/intra-node interconnects.
-The Heterogeneous Computing model consists on having different processors for throughput-intensive and latency-sensitive tasks.
+The Heterogeneous Computing model consists on having different processors for different tasks.
+Concretely GPUs are in common use for throughput-intensive tasks and CPUs for latency-sensitive tasks.
 Latency-optimized CPUs use complex branch prediction, speculative execution, register remaining, etc.
 This requires a lot of silicon surface and thus also a lot of energy.
 Throughput-intensive systems reduce these complexities and work at minimal energy per bit.
@@ -14,6 +15,6 @@ Nvidia is betting on Heterogeneous Computing by using their GPUs as accelerators
 Nvidia is now building their GPUs not only for graphics but also for High Performance Computing.
 This document focuses on Pascal --- the latest architecture presented by Nvidia --- with an special focus on the new interconnect, NVLink.
 NVLink is specially relevant because it breaks the PCIe bottlenecks appearing at GPU-to-GPU communication, allowing for faster multi-GPU systems.
-Then Pascal is put in contrast with previous architectures Maxwell and Kepler.
-Finally there is a description of an attempt to create a general hardware model for GPGPU.
+Then Pascal is put in contrast with the previous architectures Maxwell and Kepler.
+Finally there is a description of an attempt of creating a general hardware model for GPGPU.
 \end{abstract}

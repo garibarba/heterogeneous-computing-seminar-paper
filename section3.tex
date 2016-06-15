@@ -35,11 +35,10 @@ However, 4 of the Streaming Multiprocessors on the chip are turned off, giving a
 \end{figure}
 
 Each Streaming Multiprocessor has two sets of 32 FP32 CUDA Cores, an instruction buffer, and a warp scheduler with two dispatch units.
-Since the register file size per CUDA Core is doubled, there can be more thread blocks running concurrently.
 
 There is a new scheduler data path too.
 As in older architectures, each warp scheduler in Pascal Streaming Multiprocessors can dispatch two independent instructions simultaneously.
-There is also a 2:1 ratio of FP64 to FP32 CUDA Cores per Streaming Multiprocessor, which now works better with the updated data path.
+There is also a 1:2 ratio of FP64 to FP32 CUDA Cores per Streaming Multiprocessor, working better with the updated data path.
 FP16 is handled by the same FP32 ALUs.
 
 The minimum block size for FP32 remains of 32 threads.
@@ -48,8 +47,9 @@ The minimum block size for FP16 and FP64 is not specified.
 \subsection{Compute Preemption}
 The GP100 chip has preemption at instruction-level.
 It allows interaction with long computing tasks, swapping contexts to GPU DRAM.
-Otherwise, long running tasks can end up being killed by the OS or the CUDA driver.
-Additionally, if a GPU is being used for display graphics and CUDA tasks, long running tasks can result in an unresponsive GUI.
+Otherwise, long running tasks could end up being killed by the OS or the CUDA driver.
+Additionally, if a GPU is being used for display graphics and CUDA tasks, long running tasks could result in an unresponsive GUI.
+This does not happen anymore.
 This also makes interactive debugging work better.
 Interactive debugging on Kepler and Maxwell required adding instrumentation during compilation to allow completion of thread blocks after an interrupt.
 Thus GP100 debugging is more robust and lightweight.
@@ -61,10 +61,10 @@ There are two cache levels --- L1/shared and L2 --- which improve access to off-
 
 The L1/shared memory structure has not changed since Maxwell.
 Each Streaming Multiprocessor disposes of 64KB shared memory --- up to 32KB per Thread Block.
-This improves thread concurrency capabilities.
 L1/texture cache is additional to that.
 The Register File Size per Streaming Multiprocessor remains at 256KB.
-It should be noted that the number of cores per Streaming Multiprocessor has been at least halved comparing with previous architectures.
+It should be noted that the number of cores per Streaming Multiprocessor has been at least halved compared to previous architectures.
+All this additional fast memory improves thread concurrency capabilities.
 
 There are eight 512-bit memory controllers to communicate with off-chip memory, as seen on the left side of Figure \ref{fig:gp100}.
 There is a unifed 4096KB L2 cache, which gives 512KB per memory controller.
@@ -73,10 +73,11 @@ There is a unifed 4096KB L2 cache, which gives 512KB per memory controller.
 HBM2 is the second generation of High Bandwidth Memory.
 HBM is the first 3D-memory technology to be in broad use.
 Each stack of HBM2 is controlled by a pair of memory controllers.
-A HBM2 stack is composed by 4 or 8 dies with microscopic wires which go down the stack.
+A HBM2 stack can be composed by 4 or 8 dies with microscopic wires which go down the stack.
 Each HBM2 die has a 8Gb capacity, giving a total of 4 or 8GB per stack.
 This distribution enables a higher number of connections, increasing the communication bandwidth.
 Stacked memory uses less surface, which also allows for denser servers.
+The Tesla P100 uses 4 stacks of 4 dies, providing with 16GB of memory.
 
 Each die is connected through two 128-bit channels.
 These channels are independent and not necessarily asynchronous.
@@ -90,13 +91,13 @@ HBM1 supported only 4 dies per stack and 2Gb per die.
 HBM1 supported 125GB/sec per stack while HBM2 supports 180GB/sec.
 % P100 will have initially 4-die HBM2 stacks, making a total of 16GB of mmemory.
 
-When working on large clusters or having long application executions, it becomes important to have a memory error correction system
+When working on large clusters or having long application executions, it becomes important to have a memory error correction system.
 HBM2 has native support for ECC.
 This contrasts with GDDR5 which does not have internal ECC, which only allows ECC to detect error on the bus.
 This approach requires allocating an 6.25\% of the memory for error correction, and results in a 12-15\% reduction in bandwidth.
 Internal ECC detects and corrects single-bit soft errors before they affect the system, without requiring to reserve some of the memory for this function.
 
-Another relevant incorporation is a new block on the chip called High-Speed Hub (HSHUB) --- on the bottom of Figure \ref{fig:gp100} --- which has access to the High-Speed Copy Engines enabling NVLink access.A
+Another relevant incorporation is a new block on the chip called High-Speed Hub (HSHUB) --- on the bottom of Figure \ref{fig:gp100} --- which has access to the High-Speed Copy Engines enabling NVLink access.
 NVLink is an important addition that makes working with Unified Memory more efficient.
 
 \subsubsection{Unified Memory}
@@ -106,7 +107,7 @@ Unified Virtual Addressing enabled pinning CPU memory to be accesible directly o
 This provided convenience but no performance improvement.
 
 Unified Memory was introduced in CUDA 6.
-In CUDA 6 single pointer can refer to both CPU and GPU memory.
+In CUDA 6, a single pointer can refer to both CPU and GPU memory.
 It worked through automatical data migration handled by software.
 As described in section \ref{subsec:unifmemanaly}, all managed memory touched by the CPU had to be synchronized.
 Additionally, CPU and GPU could not access the same memory allocation simultaneously.
@@ -132,58 +133,18 @@ Operating system support is being developed in collaboration with Red Hat and th
 Aside from making GPU programming easier, this also allows easier use of C++ classes on GPU.
 Any nested data can be automatically accessed thanks to the single virtual addres.
 
-\subsection{Unified Memory Analysis \cite{li2015evaluation}} \label{subsec:unifmemanaly}
-An evaluation of Unified Memory under GK110 --- Kepler chip, installed on the K40 Accelerator --- is provided in \cite{li2015evaluation}.
-It describes the Unified Memory programming model and presents an evaluation methodology to try to understand how the automatic system works.
-It is known that the system handles data migration transparently, but the workflow is unknown.
-The tests are carried on the K40 Accelerator and the Jetson TK1 (embedded).
-The latter is interesting because it has physically unified memory.
-
-To evaluate the performance three different benchmarks are used.
-One is the Matrix Multiplication benchmark.
-It consists of tests with both cuBLAS and a block matrix multiplication that uses shared memory.
-The second is the Diffussion 3D Benchmark.
-The last one is the Parboil Benchmark Suite, created for studying the performance of computer architectures and compilers.
-Only the benchmarks using a constant memory size are used.
-The comparison is made by modifying them to use Unified Memory.
-No other optimization changes are made.
-The tool used to analyze the different runs is the NVIDIA Profiler.
-The Profiler provides a graphical interface breaking down the time consumption among sub-tasks, streams, etc.
-It is also shown that the structure and content of PTX codes (pseudo-asssembly codes for CUDA) does not change.
-
-\begin{figure}[ht!]
-    \centering
-    \includegraphics[width=\linewidth]{unified_memory_benchmark_results}
-    \caption{Benchmark comparison results, where 1 is the value of the version without Unified Memory \cite{li2015evaluation}}
-    \label{fig:umem}
-\end{figure}
-
-As seen in \ref{fig:umem}, it is found that there are 10\% performance losses in average.
-This is shown to be due to redundant memory transfers and page caching faults.
-These losses are in some benchmarks considerably smaller under CUDA 6.5 than under CUDA 6.0.
-The kernel running time in CUDA 6.5 does not improve.
-It is the performance of launching and synchronizing what improves between both CUDA versions.
-Interestingly, the Jetson TK1 uses the memory of CPU and GPU separately, even when it is physically one, resulting in uneeded copies.
-It is also shown that pinned memory is used for Unified Memory.
-This is revealed by the fact that copying times from host to device are much lower under Unified Memory.
-
-Finally, five micro-benchmarks are created to look for the conditions causing the performance loss.
-It is seen that memory is copied from host to device even if no kernel uses it.
-Memory also gets copied back and forth even if it is only read by the GPU.
-Only in the case that the CPU never reads or writes the data, are there no redundant memory transfers.
-
-This same research group intends to analyze the performance under of Unified Memory in multi-GPU systems in the future.
-These results should suffer very relevant changes due to hardware support for page faulting and the higher speeds of NVLink.
+It is important to note that Unified Memory can easily lead to communication bottlenecks.
+In order to paliate this problem, Nvidia has developed NVLink.
 
 \subsection{NVLink}
 
 Clusters of multi-GPU systems are being interconnected with InfiniBand(R) and 100Gb Ethernet.
 The GPUs to CPUs ratio is increasing.
 Fast cluster interconnections and this increasing ratio are causing PCIe to become a significant bottleneck for data-intensive tasks.
-That is why NVLink was developed.
+That is why NVLink has been developed.
 
 \subsubsection{Previously existing features}
-RDMA has already been in use for some time.
+RDMA has already been possible for some time.
 GPUDirect was introduced in Kepler and allowed RDMA, lowering CPU overhead.
 This is thanks to the CPU not having to copy the data inside its own memory.
 It also enabled P2P data transfer between GPUs.
@@ -224,7 +185,7 @@ Data is transmitted over a set of differential pairs with a bandwidth of 20Gb/se
 A total of 16 pairs form a Link, with 8 pairs for each direction.
 This results in a total bidirectional bandwidth of up to 40GB/sec per Link.
 It is important to remark that this is bidirectional because there has been some confusion with this.
-PCIe Gen 3 x16, the current technology in use, provides a bidiriectional bandwidth of up to 31.75GB/s.
+PCIe Gen 3 x16 --- the current technology in use --- provides a bidiriectional bandwidth of up to 31.75GB/s.
 In this way NVLink is just about 20\% faster than PCIe, and slower than PCIe 4.0 which doubles the bandwidth of PCIe 3.0.
 However it is NVLink's capability of joining several links to add up their bandwidths what makes it really faster.
 Since the Tesla P100 supports up to 4 links, this allows up to 160GB/sec bidirectional data transfer.
@@ -245,7 +206,7 @@ It allows detection of up to 5 random bit errors or up to 25-bit bursts of error
 Packets are stored in a replay buffer until the receiver acknowledges them.
 If the transmitter times out waiting for acknowledgment, it starts retransmitting.
 
-The Transaction Layer cares for synchronization, link flow control, virtual channels.
+The Transaction Layer cares for synchronization, link flow control, and virtual channels.
 It can also aggregate multiple links together to provide higher communication bandwidth.
 
 \section{NVLink performance}
@@ -254,7 +215,7 @@ Since it was done in 2014, the analysis was done on a theoretical basis.
 It focuses on the performance benefits for GPU-to-GPU communications through NVLink.
 Two systems with and without NVLink are analyzed for the different cases.
 The systems with NVLink can be seen in Figure \ref{fig:nvlinkconfigs}.
-The base systems are the same just removing the NVLink connections.
+The base case systems are the same just removing the NVLink connections.
 It assumes a 80\% communication efficiency for both PCIe and NVLink.
 
 \begin{figure}[ht!]
@@ -268,9 +229,9 @@ It assumes a 80\% communication efficiency for both PCIe and NVLink.
 
 The theoretical test-cases are a multi-GPU exchange and sort, a Fast Fourier Transform, AMBER-Molecular Dynamics, ANSYS Fluent, and a Lattice Quantum Chromodynamics library.
 The exchange and sort case achieves an improvement directly proportional to the parallel communication speed-up.
-The FFT case shows that NVLink also makes multi-GPU scaling work for smaller problems by reducing the communication/computation time ratio.
+The FFT case shows that NVLink also makes multi-GPU scaling worth for smaller problems by reducing the communication/computation time ratio.
 AMBER's PMEMD algorithm can be decomposed into a N-body simulation and a FFT which can run asynchronously.
 This is already a complex case to analyze, but it is estimated that a 30-50\% improvement for 4 GPUs can be achieved just by using NVLink.
-In the ANSYS Fluent case an improvement of 25\% for 2 GPUs is expected to be achieved due to synchronous communication speed-up.
+In the ANSYS Fluent case an improvement of 25\% for 2 GPUs is expected to be achieved through a synchronous communication speed-up.
 In the LQCD case, the speed-up depends on the memory bandwidth, the interconnect bandwidth and the surface-to-volume ratio of the computation.
 It is estimated that a 25\% improvement for 4 GPUs is also to be expected.
