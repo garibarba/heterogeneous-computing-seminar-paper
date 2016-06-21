@@ -25,7 +25,7 @@ The first level is composed by the GigaThread Engine, CUDA Work Distributor, Dat
 Each Streaming Multiprocessor is broken into analogous components of the 0th level.
 These are the Thread controller, Warp scheduler, Load/Store Units, local/shared registers and ALU arrays.
 
-Analogous components of different levels have different behaviours.
+Analogous components of different levels have different behaviors.
 For example, the Processing Elements which are the ALU arrays (0th level) and Streaming Multiprocessor array (first level).
 Each Streaming Multiprocessor works asynchronously, whereas groups of 32 ALUs have to work synchronously under a common program counter.
 Other analogous components at different levels are Load/Store Units vs Data Transfer Engine arrays, local/shared registers vs local/global memory,

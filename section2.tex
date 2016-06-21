@@ -9,14 +9,14 @@ The latter is interesting because it has physically unified memory.
 To evaluate the performance, three different benchmarks are used.
 One is the Matrix Multiplication benchmark.
 It consists of tests with both cuBLAS and a block matrix multiplication that uses shared memory.
-The second is the Diffussion 3D Benchmark.
+The second is the Diffusion 3D Benchmark.
 The last one is the Parboil Benchmark Suite, created for studying the performance of computer architectures and compilers.
 Only the benchmarks using a constant memory size are used.
 The comparison is made by modifying them to use Unified Memory.
 No optimization changes are made.
 The tool used to analyze the different runs is the NVIDIA Profiler.
 The Profiler provides a graphical interface breaking down the time consumption among sub-tasks, streams, etc.
-It is also shown that the structure and content of PTX codes (pseudo-asssembly codes for CUDA) does not change.
+It is also shown that the structure and content of PTX codes (pseudo-assembly codes for CUDA) does not change.
 
 \begin{figure}[ht!]
     \centering
@@ -30,7 +30,7 @@ This is shown to be due to redundant memory transfers and page caching faults.
 These losses are in some benchmarks considerably smaller under CUDA 6.5 than under CUDA 6.0.
 The kernel running time in CUDA 6.5 does not improve.
 It is the performance of launching and synchronizing what improves between both CUDA versions.
-Interestingly, the Jetson TK1 uses the memory of CPU and GPU separately, even when it is physically one, resulting in uneeded copies.
+Interestingly, the Jetson TK1 uses the memory of CPU and GPU separately, even when it is physically one, resulting in unnecessary copies.
 It is also shown that pinned memory is used for Unified Memory.
 This is revealed by the fact that copying times from host to device are much lower under Unified Memory.
 

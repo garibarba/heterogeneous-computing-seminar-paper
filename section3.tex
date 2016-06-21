@@ -20,7 +20,7 @@ All of them are present in the Tesla P100 Accelerator.
     \label{fig:gp100}
 \end{figure}
 
-The Pascal architecture is structured as an array of Graphics Processing Clusters, formed by Texture Processing Clusters, consisting of 2 Streaming Multiprocessors.
+The Pascal architecture is structured as an array of Graphics Processing Clusters, each GPC is formed by several Texture Processing Clusters, consisting of 2 Streaming Multiprocessors per TPC.
 The reason for conceptually grouping 2 Streaming Multiprocessors into one Texture Processing Cluster is not specified.
 The GP100 processor has 6 Graphics Processing Clusters with 10 Streaming Multiprocessors each.
 Each Streaming Multiprocessor contains 64 CUDA FP32 Cores and 4 texture units (see Figure \ref{fig:sm}).
@@ -63,17 +63,25 @@ The L1/shared memory structure has not changed since Maxwell.
 Each Streaming Multiprocessor disposes of 64KB shared memory --- up to 32KB per Thread Block.
 L1/texture cache is additional to that.
 The Register File Size per Streaming Multiprocessor remains at 256KB.
-It should be noted that the number of cores per Streaming Multiprocessor has been at least halved compared to previous architectures.
+It should be noted that the number of cores per Streaming Multiprocessor has been at least halved compared to previous architectures, while the number of Streaming Multiprocessors increases.
+A summary of this evolution can be seen in Figure \ref{fig:cuda_cores}
 All this additional fast memory improves thread concurrency capabilities.
 
 There are eight 512-bit memory controllers to communicate with off-chip memory, as seen on the left side of Figure \ref{fig:gp100}.
-There is a unifed 4096KB L2 cache, which gives 512KB per memory controller.
+There is a unified 4096KB L2 cache, which gives 512KB per memory controller.
 
 \subsubsection{Off-chip memory --- HBM2}
+
+\begin{figure}[ht!]
+    \centering
+    \includegraphics[width=\linewidth]{hbm}
+    \caption{Chip structure using HBM memory \cite{amd:hbm}}
+    \label{fig:hbm}
+\end{figure}
 HBM2 is the second generation of High Bandwidth Memory.
 HBM is the first 3D-memory technology to be in broad use.
 Each stack of HBM2 is controlled by a pair of memory controllers.
-A HBM2 stack can be composed by 4 or 8 dies with microscopic wires which go down the stack.
+A HBM2 stack can be composed by 4 or 8 dies with vertical microscopic wires (called through-silicon vias) that go down the stack.
 Each HBM2 die has a 8Gb capacity, giving a total of 4 or 8GB per stack.
 This distribution enables a higher number of connections, increasing the communication bandwidth.
 Stacked memory uses less surface, which also allows for denser servers.
@@ -81,7 +89,8 @@ The Tesla P100 uses 4 stacks of 4 dies, providing with 16GB of memory.
 
 Each die is connected through two 128-bit channels.
 These channels are independent and not necessarily asynchronous.
-The stacks have to be connected to the chip via a passive silicon interposer.
+The stacks have to be connected to the chip via a passive silicon interposer (see Figure \ref{fig:hbm}).
+It is a large piece of silicon with some carved wires.
 This means a large silicon surface, which is expensive.
 That is why lower-range Pascal cards --- such as graphics oriented GTX1080 --- will use GDDR5 or GDDR5X.
 The height of the dies is adjusted --- the top die is thicker --- in order to make good contact with the heat sink.
@@ -89,7 +98,6 @@ The height of the dies is adjusted --- the top die is thicker --- in order to ma
 HBM2 is a significant scale up on its previous version.
 HBM1 supported only 4 dies per stack and 2Gb per die.
 HBM1 supported 125GB/sec per stack while HBM2 supports 180GB/sec.
-% P100 will have initially 4-die HBM2 stacks, making a total of 16GB of mmemory.
 
 When working on large clusters or having long application executions, it becomes important to have a memory error correction system.
 HBM2 has native support for ECC.
@@ -103,22 +111,22 @@ NVLink is an important addition that makes working with Unified Memory more effi
 \subsubsection{Unified Memory}
 The path to Unified Memory is being followed since several CUDA versions ago.
 CUDA 4 introduced Unified Virtual Addressing.
-Unified Virtual Addressing enabled pinning CPU memory to be accesible directly over PCIe without a memcpy.
+Unified Virtual Addressing enabled pinning CPU memory to be accessible directly over PCIe without a memcpy.
 This provided convenience but no performance improvement.
 
-Unified Memory was introduced in CUDA 6.
-In CUDA 6, a single pointer can refer to both CPU and GPU memory.
-It worked through automatical data migration handled by software.
-As described in section \ref{subsec:unifmemanaly}, all managed memory touched by the CPU had to be synchronized.
-Additionally, CPU and GPU could not access the same memory allocation simultaneously.
-The address space was limited to the size of the GPU physical memory.
+The term Unified Memory was introduced in CUDA 6.
+In CUDA 6, not only is pinned memory accessible through PCIe, but a single pointer can refer to both CPU and GPU memory.
+This requires pinned CPU memory to be associated with GPU memory of the same size, and limits the unified address space to the size of GPU memory.
+A single memory allocation in pinned CPU memory and GPU memory is kept synchronized through software.
+As described in section \ref{subsec:unifmemanaly}, all managed memory touched by the CPU has to be synchronized.
+Additionally, CPU and GPU cannot access the same memory allocation simultaneously.
 
 Together with Pascal and NVLink, the CUDA 8 platform has been released.
 Now a single memory address space for CPU and GPU with 49-bit virtual addressing has been introduced.
 Since current CPUs have up to 48-bit virtual addressing, 49 bits is enough to cover both spaces as a single virtual address space.
 Now the memory limits of the GPU do not restrict the virtual space size.
 Additionally, the GP100 chip has hardware support for page faulting, which allows transparent access to data anywhere in the virtual address spaces.
-This means there is no need for synchromization of all managed memory allocations.
+This means there is no need for synchronization of all managed memory allocations.
 The large address space allows direct addressing of very large datasets, much larger than the system memory.
 Faulted pages are automatically migrated.
 Pages can also be mapped on the GPU for access through PCIe or NVLink.
@@ -131,10 +139,10 @@ Note that correct synchronization has to be taken care of as in any other parall
 Operating system support is being developed in collaboration with Red Hat and the Linux community to enable GPUs to access memory allocated with the default OS allocator, such as malloc.
 
 Aside from making GPU programming easier, this also allows easier use of C++ classes on GPU.
-Any nested data can be automatically accessed thanks to the single virtual addres.
+Any nested data can be automatically accessed thanks to the single virtual address.
 
 It is important to note that Unified Memory can easily lead to communication bottlenecks.
-In order to paliate this problem, Nvidia has developed NVLink.
+In order to alleviate this problem, Nvidia has developed NVLink.
 
 \subsection{NVLink}
 
@@ -185,7 +193,7 @@ Data is transmitted over a set of differential pairs with a bandwidth of 20Gb/se
 A total of 16 pairs form a Link, with 8 pairs for each direction.
 This results in a total bidirectional bandwidth of up to 40GB/sec per Link.
 It is important to remark that this is bidirectional because there has been some confusion with this.
-PCIe Gen 3 x16 --- the current technology in use --- provides a bidiriectional bandwidth of up to 31.75GB/s.
+PCIe Gen 3 x16 --- the current technology in use --- provides a bidirectional bandwidth of up to 31.75GB/s.
 In this way NVLink is just about 20\% faster than PCIe, and slower than PCIe 4.0 which doubles the bandwidth of PCIe 3.0.
 However it is NVLink's capability of joining several links to add up their bandwidths what makes it really faster.
 Since the Tesla P100 supports up to 4 links, this allows up to 160GB/sec bidirectional data transfer.

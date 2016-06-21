@@ -12,8 +12,6 @@ Just as GeForce is Nvidia's Desktop family, and Jetson their embedded family, Te
 Tesla was also the name of the microarchitecture in 2008, when they introduced CUDA.
 Since then there has been a mostly continuous progress towards their latest microarchitecture, Pascal, presented in April 2016.
 The biggest changes were introduced in the Fermi microarchitecture.
-% This recency makes that to date there is no technical analysis of the new microarchitecture, as there is of previous ones.
-% The main source of information comes from the Whitepaper for the GP100 GPU, presenting the Pascal microarchitecture.
 
 \subsection{Historical progress}
 In 2010, Nvidia presented the Fermi microarchitecture, easing intensive use of GPUs in HPC.
@@ -24,7 +22,7 @@ L2 and DRAM were enabled to access host CPU memory through PCIe.
 The amount of L1 and L2 were configurable for the programmer, allowing a variable fixed fraction of shared memory.
 
 The next generation, Kepler, was introduced in 2012 and introduced Dynamic Parallelism.
-Dynamic Parallelism refers to enabling GPU threads to launch other threads (kernels launching kenerls).
+Dynamic Parallelism refers to enabling GPU threads to launch other threads (kernels launching kernels).
 This provides the programming model with more flexibility.
 This architecture is the one currently in use for GPGPU HPC tasks requiring 64-bit floating point precision.
 
@@ -42,11 +40,18 @@ FP16 operations are supported at double the rate of FP32 operations.
 Pascal also introduces preemption at the instruction level.
 All this comes with a reduction of the transistor size by using a 16nm FinFET technology.
 
-The Volta microarchitecture was suposed to follow Maxwell.
+The Volta microarchitecture was supposed to follow Maxwell.
 However, lack of maturity of Hybrid Memory Cube versus High Bandwidth Memory, forced Nvidia to switch to the Pascal microarchitecture \cite{wccftech:volta}.
 Volta systems will be installed in supercomputers in 2017, coming to the market in 2018.
 
 \subsection{Recent evolution --- Pascal vs Kepler and Maxwell}
+
+\begin{figure}[ht!]
+    \centering
+    \includegraphics[width=\linewidth]{cuda_cores}
+    \caption{Extract of table comparing Kepler, Maxwell and Pascal \cite{nvidia:pascalwhitepaper}}
+    \label{fig:cuda_cores}
+\end{figure}
 The intent of this section is to try to make the recent architecture changes clear.
 The relevant architectures for this comparison are Pascal, Maxwell and Kepler.
 The chip representing Pascal is the GP100, installed in the Tesla P100.
@@ -64,7 +69,7 @@ The number of CUDA Cores per Streaming Multiprocessor keeps decreasing.
 The GK110, GM200, and GP100 have respectively 192, 128 and 64 FP32 CUDA Cores per Streaming Multiprocessor.
 Kepler has a ratio of 1:3 FP64 to FP32 CUDA Cores, which was decreased to 1:32 in Maxwell.
 Pascal has increased this ratio to 1:2 by having FP16 as part of the FP32 ALUs.
-The number of Streaming Multiprocessors per GPU increases continously, giving an increasing number of CUDA Cores per GPU.
+The number of Streaming Multiprocessors per GPU increases continuously, giving an increasing number of CUDA Cores per GPU.
 
 The scheduler data path in Pascal is changed with respect to Kepler and Maxwell.
 A big improvement in the scheduler in comparison to Maxwell is that each warp scheduler can dispatch two warp instructions per clock.
