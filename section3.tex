@@ -64,7 +64,7 @@ Each Streaming Multiprocessor disposes of 64KB shared memory --- up to 32KB per 
 L1/texture cache is additional to that.
 The Register File Size per Streaming Multiprocessor remains at 256KB.
 It should be noted that the number of cores per Streaming Multiprocessor has been at least halved compared to previous architectures, while the number of Streaming Multiprocessors increases.
-A summary of this evolution can be seen in Figure \ref{fig:cuda_cores}
+A summary of this evolution can be seen in Figure \ref{fig:cuda_cores}.
 All this additional fast memory improves thread concurrency capabilities.
 
 There are eight 512-bit memory controllers to communicate with off-chip memory, as seen on the left side of Figure \ref{fig:gp100}.
@@ -75,13 +75,13 @@ There is a unified 4096KB L2 cache, which gives 512KB per memory controller.
 \begin{figure}[ht!]
     \centering
     \includegraphics[width=\linewidth]{hbm}
-    \caption{Chip structure using HBM memory \cite{amd:hbm}}
+    \caption{Chip structure using HBM memory \cite{amd:hbm}. The memory and the chip share a silicon interposer connection \cite{amkor:hbmwhitepaper}.}
     \label{fig:hbm}
 \end{figure}
 HBM2 is the second generation of High Bandwidth Memory.
 HBM is the first 3D-memory technology to be in broad use.
 Each stack of HBM2 is controlled by a pair of memory controllers.
-A HBM2 stack can be composed by 4 or 8 dies with vertical microscopic wires (called through-silicon vias) that go down the stack.
+A HBM2 stack can be composed by 4 or 8 dies with perpendicular microscopic wires (called through-silicon vias) that go down the stack.
 Each HBM2 die has a 8Gb capacity, giving a total of 4 or 8GB per stack.
 This distribution enables a higher number of connections, increasing the communication bandwidth.
 Stacked memory uses less surface, which also allows for denser servers.
@@ -89,8 +89,8 @@ The Tesla P100 uses 4 stacks of 4 dies, providing with 16GB of memory.
 
 Each die is connected through two 128-bit channels.
 These channels are independent and not necessarily asynchronous.
-The stacks have to be connected to the chip via a passive silicon interposer (see Figure \ref{fig:hbm}).
-It is a large piece of silicon with some carved wires.
+The stacks are connected to the chip via a passive silicon interposer (see Figure \ref{fig:hbm}).
+It is a large piece of passive silicon also using through-silicon vias (TSVs) for connections.
 This means a large silicon surface, which is expensive.
 That is why lower-range Pascal cards --- such as graphics oriented GTX1080 --- will use GDDR5 or GDDR5X.
 The height of the dies is adjusted --- the top die is thicker --- in order to make good contact with the heat sink.
